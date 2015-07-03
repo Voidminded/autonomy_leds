@@ -1,0 +1,14 @@
+*.cof
+*.hex
+*.obj
+*.elf
+*.conf
+*.o
+*.bin
+*.lst
+*.map
+*.srec
+*.eep
+*.lss
+*.sym
+.dep/
