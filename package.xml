@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package>
+  <name>autonomy_leds</name>
+  <version>0.1.0</version>
+  <description>Firmware for autonomy LED strip based on rosserial-client</description>
+
+  <maintainer email="mmonajje@sfu.ca">Mani Monajjemi</maintainer>
+
+  <license>BSD</license>
+
+
+  <url type="website">http://autonomylab.org/autonomy_leds</url>
+  <url type="repository">https://github.com/AutonomyLab/autonomy_leds</url>
+
+  <author email="mmonajje@sfu.ca">Mani Monajjemi</author>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rosserial_client</build_depend>
+  <build_depend>rosserial_msgs</build_depend>
+  <run_depend>rosserial_client</run_depend>
+  <run_depend>rosserial_msgs</run_depend>
+
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+  </export>
+</package>
