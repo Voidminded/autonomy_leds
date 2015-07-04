@@ -1,0 +1,8 @@
+## LUFA
+http://www.fourwalledcubicle.com/LUFA.php
+MIT License
+Adapted from: https://github.com/mrjogo/rosserial_avr_tutorial/tree/lufa
+
+##light_apa102_AVR
+https://github.com/cpldcpu/light_ws2812/tree/master/light_apa102_AVR
+GPLv2 License
