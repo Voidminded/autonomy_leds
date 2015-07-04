@@ -117,7 +117,7 @@ TARGET = leds_firmware
 OBJDIR = .
 
 # Path to the LUFA library
-LUFA_PATH = .
+LUFA_PATH = ./thirdparty
 
 # LUFA library compile-time options and predefined tokens
 LUFA_OPTS  = -D USB_DEVICE_ONLY
@@ -130,14 +130,13 @@ LUFA_OPTS += -D USE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_ENAB
 # Create the LUFA source path variables by including the LUFA root makefile
 include $(LUFA_PATH)/LUFA/makefile
 
+APA_PATH = ./thirdparty/Light_apa102
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = src/avr_time.c src/Descriptors.c $(LUFA_SRC_USB) $(LUFA_SRC_USBCLASS)
-
+SRC = src/avr_time.c src/Descriptors.c $(LUFA_SRC_USB) $(LUFA_SRC_USBCLASS) $(APA_PATH)/light_apa102.c
 
 # List C++ source files here. (C dependencies are automatically generated.)
 CPPSRC = src/$(TARGET).cpp src/Atmega32u4Hardware.cpp ros_lib/time.cpp ros_lib/duration.cpp
-
 
 # List Assembler source files here.
 #     Make them always end in a capital .S.  Files ending in a lowercase .s
@@ -166,7 +165,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = $(LUFA_PATH)/ ./ros_lib/ ./include
+EXTRAINCDIRS = $(LUFA_PATH)/ ./ros_lib/ ./include $(APA_PATH)
 
 
 # Compiler flag to set the C Standard level.
@@ -174,7 +173,8 @@ EXTRAINCDIRS = $(LUFA_PATH)/ ./ros_lib/ ./include
 #     gnu89 = c89 plus GCC extensions
 #     c99   = ISO C99 standard (not yet fully implemented)
 #     gnu99 = c99 plus GCC extensions
-CSTANDARD = -std=c99
+# APA requires GNU extentions
+CSTANDARD = -std=gnu99
 
 
 # Place -D or -U options here for C sources

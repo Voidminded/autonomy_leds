@@ -10,6 +10,8 @@ extern "C"
     #include <util/delay.h>
     #include <LUFA/Drivers/USB/USB.h>
     #include <avr/io.h>
+    #include <avr/interrupt.h>
+    #include "light_apa102.h"
 }
 
 // Needed for AVR to use virtual functions
@@ -17,12 +19,22 @@ extern "C" void __cxa_pure_virtual(void);
 void __cxa_pure_virtual(void) {}
 
 /* CONSTANTS */
+#define NUM_LEDS 10
 #define LED PC7
 #define MAX_MSG_SIZE 20
+
+/* LED Memory */
+unsigned int led_counter = 0;
+struct cRGB led_strip[NUM_LEDS];
 
 void toggle_led()
 {
     PORTC ^= (1 << LED);
+    for (led_counter = 0; led_counter < NUM_LEDS; led_counter++)
+    {
+        led_strip[led_counter].r ^= 255;
+    }
+    apa102_setleds(led_strip, NUM_LEDS);
 }
 
 void toggle_leds_cb(const std_msgs::Empty& toggle_msg)
@@ -35,10 +47,21 @@ int init_io()
     DDRC |= (1 << LED);
 }
 
+int init_led_strip()
+{
+    for (led_counter = 0; led_counter < NUM_LEDS; led_counter++)
+    {
+        led_strip[led_counter].r = 0;
+        led_strip[led_counter].g = 0;
+        led_strip[led_counter].b = 0;
+    }
+}
+
 int main()
 {
   /* IO */
   init_io();
+  init_led_strip();
 
   /* Variables */
   char hello[MAX_MSG_SIZE];
