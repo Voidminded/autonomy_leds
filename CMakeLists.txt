@@ -69,12 +69,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES autonomy_leds
-#  CATKIN_DEPENDS rosserial_client rosserial_msgs
-#  DEPENDS system_lib
-)
+catkin_package()
 
 ###########
 ## Build ##
@@ -87,7 +82,26 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-## Declare a cpp library
+rosserial_generate_ros_lib(
+  PACKAGE rosserial_client
+  SCRIPT make_libraries
+)
+
+include(ExternalProject)
+ExternalProject_Add(autonomy_leds_firmware
+  URL ${CMAKE_CURRENT_SOURCE_DIR}/firmware
+  CONFIGURE_COMMAND ""
+  # Unfortunately the Makfile does not handle absolute paths to source files correctly,
+  # since the OBJDIR treats everything as relative. The following is a nasty hack
+  #BUILD_COMMAND make install ROSLIBDIR=${${PROJECT_NAME}_ROS_LIB_DIR} DESTDIR=${CATKIN_DEVEL_PREFIX}/share
+  BUILD_COMMAND make install ROSLIBDIR=../../../ros_lib DESTDIR=${CATKIN_DEVEL_PREFIX}/share
+  INSTALL_COMMAND make dfu
+  BUILD_IN_SOURCE 1
+)
+
+add_dependencies(autonomy_leds_firmware autonomy_leds_ros_lib)
+
+# Declare a cpp library
 # add_library(autonomy_leds
 #   src/${PROJECT_NAME}/autonomy_leds.cpp
 # )

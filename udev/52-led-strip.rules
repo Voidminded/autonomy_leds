@@ -1,0 +1,10 @@
+# Adapted from: https://www.pjrc.com/teensy/49-teensy.rules
+
+ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2044", ENV{ID_MM_DEVICE_IGNORE}="1"
+ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2044", ENV{MTP_NO_PROBE}="1"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2044", GROUP:="dialout"
+KERNEL=="ttyACM0", ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2044", GROUP:="dialout"
+
+# DFU bootloader mode
+
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2ff4", GROUP:="dialout"

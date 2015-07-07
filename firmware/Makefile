@@ -60,6 +60,11 @@
 # To rebuild project do "make clean" then "make all".
 #----------------------------------------------------------------------------
 
+# I added two new parameters to this Makefile so it plays nice with catkin
+# ROSLIBDIR: Path to ros_lib dir created either automatically or by catkin
+# DESTDIR: Path to installation directory for the final hex file
+# make install ROSLIBDIR=path1 DESTDIR=path2 can be invoked by a cmake external project call
+# from a catkin-based CMake file
 
 # MCU name
 MCU = atmega32u4
@@ -126,17 +131,20 @@ LUFA_OPTS += -D FIXED_NUM_CONFIGURATIONS=1
 LUFA_OPTS += -D USE_FLASH_DESCRIPTORS
 LUFA_OPTS += -D USE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_ENABLED | USB_OPT_AUTO_PLL)"
 
-
 # Create the LUFA source path variables by including the LUFA root makefile
 include $(LUFA_PATH)/LUFA/makefile
 
+# Custom
 APA_PATH = ./thirdparty/Light_apa102
+ROSLIBDIR = ./ros_lib
+DESTDIR = /usr/local/share
+PREFIX = $(DESTDIR)/autonomy_leds
 
 # List C source files here. (C dependencies are automatically generated.)
 SRC = src/avr_time.c src/Descriptors.c $(LUFA_SRC_USB) $(LUFA_SRC_USBCLASS) $(APA_PATH)/light_apa102.c
 
 # List C++ source files here. (C dependencies are automatically generated.)
-CPPSRC = src/$(TARGET).cpp src/Atmega32u4Hardware.cpp ros_lib/time.cpp ros_lib/duration.cpp
+CPPSRC = src/$(TARGET).cpp src/Atmega32u4Hardware.cpp $(ROSLIBDIR)/duration.cpp $(ROSLIBDIR)/time.cpp 
 
 # List Assembler source files here.
 #     Make them always end in a capital .S.  Files ending in a lowercase .s
@@ -165,7 +173,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = $(LUFA_PATH)/ ./ros_lib/ ./include $(APA_PATH)
+EXTRAINCDIRS = $(LUFA_PATH)/ $(ROSLIBDIR)/ $(APA_PATH) ./include
 
 
 # Compiler flag to set the C Standard level.
@@ -706,6 +714,8 @@ checksource:
 			echo "Source File Not Found: $$f" ; \
 		fi; done 
 
+install: $(TARGET).hex
+	install -D -m 0755 $(TARGET).hex $(PREFIX)/firmware/$(TARGET).hex
 
 # Create object files directory
 $(shell mkdir $(OBJDIR) 2>/dev/null)

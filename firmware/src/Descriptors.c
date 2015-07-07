@@ -207,7 +207,7 @@ const USB_Descriptor_String_t PROGMEM ManufacturerString =
 {
 	.Header                 = {.Size = USB_STRING_LEN(11), .Type = DTYPE_String},
 
-	.UnicodeString          = L"Mani"
+	.UnicodeString          = L"AutonomyLab (Based on LUFA)"
 };
 
 /** Product descriptor string. This is a Unicode string containing the product's details in human readable form,
@@ -218,7 +218,7 @@ const USB_Descriptor_String_t PROGMEM ProductString =
 {
 	.Header                 = {.Size = USB_STRING_LEN(13), .Type = DTYPE_String},
 
-	.UnicodeString          = L"Mani 2"
+	.UnicodeString          = L"Driver for LED Strip Board (AutonomyLab)"
 };
 
 /** This function is called by the library when in device mode, and must be overridden (see library "USB Descriptors"
