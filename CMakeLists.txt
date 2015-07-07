@@ -95,7 +95,7 @@ ExternalProject_Add(autonomy_leds_firmware
   # since the OBJDIR treats everything as relative. The following is a nasty hack
   #BUILD_COMMAND make install ROSLIBDIR=${${PROJECT_NAME}_ROS_LIB_DIR} DESTDIR=${CATKIN_DEVEL_PREFIX}/share
   BUILD_COMMAND make install ROSLIBDIR=../../../ros_lib DESTDIR=${CATKIN_DEVEL_PREFIX}/share
-  INSTALL_COMMAND make dfu
+  #INSTALL_COMMAND make dfu
   BUILD_IN_SOURCE 1
 )
 
