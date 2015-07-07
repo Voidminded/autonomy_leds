@@ -138,7 +138,7 @@ include $(LUFA_PATH)/LUFA/makefile
 APA_PATH = ./thirdparty/Light_apa102
 ROSLIBDIR = ./ros_lib
 DESTDIR = /usr/local/share
-PREFIX = $(DESTDIR)/autonomy_leds
+PREFIX = $(DESTDIR)/autonomy_leds_avr
 
 # List C source files here. (C dependencies are automatically generated.)
 SRC = src/avr_time.c src/Descriptors.c $(LUFA_SRC_USB) $(LUFA_SRC_USBCLASS) $(APA_PATH)/light_apa102.c

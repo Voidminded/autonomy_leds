@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>autonomy_leds</name>
+  <name>autonomy_leds_avr</name>
   <version>0.1.0</version>
   <description>Firmware for autonomy LED strip based on rosserial-client</description>
 
