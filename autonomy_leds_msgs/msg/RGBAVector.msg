@@ -1,0 +1,1 @@
+autonomy_leds_msgs/RGBAInt8[] colors_vec
