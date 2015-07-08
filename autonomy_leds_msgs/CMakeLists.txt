@@ -13,8 +13,9 @@ find_package(catkin REQUIRED COMPONENTS
 # Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  RGBAInt8.msg
-  RGBAVector.msg
+  BGRAInt8.msg
+  BGRAVector.msg
+  LED.msg
 )
 
 ## Generate services in the 'srv' folder

@@ -1,7 +1,9 @@
 /* ROS */
 #include "ros.h"
 #include "std_msgs/Empty.h"
-#include "autonomy_leds_msgs/RGBAVector.h"
+
+#include "autonomy_leds_msgs/BGRAVector.h"
+#include "autonomy_leds_msgs/LED.h"
 
 /* AVR */
 #include "Atmega32u4Hardware.h"
@@ -20,7 +22,7 @@ void __cxa_pure_virtual(void) {}
 
 /* CONSTANTS */
 #define NUM_LEDS 10
-#define LED PC7
+#define LED_PIN PC7
 #define MAX_MSG_SIZE 64
 
 /* LED Memory */
@@ -31,16 +33,25 @@ struct cRGB led_strip[NUM_LEDS];
 char log_str[MAX_MSG_SIZE];
 
 /* ROS */
-void set_cb(const autonomy_leds_msgs::RGBAVector& rgba_vec);  // Forward dec
-ros::NodeHandle nh;
-ros::Subscriber<autonomy_leds_msgs::RGBAVector> set_sub("leds/set", &set_cb);
+void set_cb(const autonomy_leds_msgs::BGRAVector& bgr_vec);
+void clear_cb(const std_msgs::Empty& msg);
+void set_led_cb(const autonomy_leds_msgs::LED& led_msg);
+void shift_left_cb(const std_msgs::Empty& msg);
+void shift_right_cb(const std_msgs::Empty& msg);
 
-int init_io()
+ros::NodeHandle nh;
+ros::Subscriber<autonomy_leds_msgs::BGRAVector> set_sub("leds/set", &set_cb);
+ros::Subscriber<std_msgs::Empty> clear_sub("leds/clear", &clear_cb);
+ros::Subscriber<std_msgs::Empty> shift_left_sub("leds/shift_left", &shift_left_cb);
+ros::Subscriber<std_msgs::Empty> shift_right_sub("leds/shift_right", &shift_right_cb);
+ros::Subscriber<autonomy_leds_msgs::LED> set_led_sub("leds/set_led", &set_led_cb);
+
+void init_io()
 {
-    DDRC |= (1 << LED);
+    DDRC |= (1 << LED_PIN);
 }
 
-int init_led_strip()
+void init_led_strip()
 {
     for (led_counter = 0; led_counter < NUM_LEDS; led_counter++)
     {
@@ -51,10 +62,9 @@ int init_led_strip()
     apa102_setleds(led_strip, NUM_LEDS);
 }
 
-/* ROS Callbacks */
 void toggle_led()
 {
-    PORTC ^= (1 << LED);
+    PORTC ^= (1 << LED_PIN);
 }
 
 void ack_led()
@@ -66,19 +76,59 @@ void ack_led()
   }
 }
 
-void set_cb(const autonomy_leds_msgs::RGBAVector& rgba_vec)
+/* ROS Callbacks */
+
+void set_cb(const autonomy_leds_msgs::BGRAVector& bgra_vec)
 {
-  uint16_t max_leds = (rgba_vec.colors_vec_length < NUM_LEDS) ? 
-    rgba_vec.colors_vec_length: NUM_LEDS;
+  uint16_t max_leds = (bgra_vec.colors_vec_length < NUM_LEDS) ? 
+    bgra_vec.colors_vec_length: NUM_LEDS;
 
   for (led_counter = 0; led_counter < max_leds; led_counter++)
   {
-    led_strip[led_counter].r = rgba_vec.colors_vec[led_counter].r;
-    led_strip[led_counter].g = rgba_vec.colors_vec[led_counter].g;
-    led_strip[led_counter].b = rgba_vec.colors_vec[led_counter].b; 
+    // Skip the pixel if a==0
+    if (bgra_vec.colors_vec[led_counter].a == 0) continue;
+    led_strip[led_counter].r = bgra_vec.colors_vec[led_counter].r;
+    led_strip[led_counter].g = bgra_vec.colors_vec[led_counter].g;
+    led_strip[led_counter].b = bgra_vec.colors_vec[led_counter].b; 
   }
 
   apa102_setleds(led_strip, max_leds);
+}
+
+void clear_cb(const std_msgs::Empty& msg)
+{
+  init_led_strip();
+}
+
+void set_led_cb(const autonomy_leds_msgs::LED& led_msg)
+{
+  if (led_msg.index >= NUM_LEDS) return;
+  led_strip[led_msg.index].r = led_msg.color.r;
+  led_strip[led_msg.index].g = led_msg.color.g;
+  led_strip[led_msg.index].b = led_msg.color.b;
+  apa102_setleds(led_strip, NUM_LEDS);
+}
+
+void shift_left_cb(const std_msgs::Empty& msg)
+{
+  cRGB buffer = led_strip[0];
+  for (led_counter = 0; led_counter < NUM_LEDS - 1; led_counter ++)
+  {
+    led_strip[led_counter] = led_strip[led_counter + 1];
+  }
+  led_strip[led_counter] = buffer;
+  apa102_setleds(led_strip, NUM_LEDS);
+}
+
+void shift_right_cb(const std_msgs::Empty& msg)
+{
+  cRGB buffer = led_strip[NUM_LEDS - 1];
+  for (led_counter = NUM_LEDS - 1; led_counter > 0; led_counter--)
+  {
+    led_strip[led_counter] = led_strip[led_counter - 1];
+  }
+  led_strip[led_counter] = buffer;
+  apa102_setleds(led_strip, NUM_LEDS);
 }
 
 int main()
@@ -92,6 +142,10 @@ int main()
 
   nh.initNode();
   nh.subscribe(set_sub);
+  nh.subscribe(clear_sub);
+  nh.subscribe(set_led_sub);
+  nh.subscribe(shift_left_sub);
+  nh.subscribe(shift_right_sub);
 
   ack_led();
 
@@ -108,9 +162,11 @@ int main()
   ack_led();
   
   // Publish some debug information
-  snprintf(log_str, MAX_MSG_SIZE, "Autonomy LED Fimware (%s)", GIT_VERSION);
+  snprintf(log_str, MAX_MSG_SIZE, "Autonomy LED Fimware started.");
   nh.loginfo(log_str);
-  
+  snprintf(log_str, MAX_MSG_SIZE, "LEDS: %d Ver: %s", NUM_LEDS, GIT_VERSION);  
+  nh.loginfo(log_str);
+
   // 50hz loop
   while(1)
   {
