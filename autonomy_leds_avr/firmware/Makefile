@@ -142,7 +142,8 @@ DESTDIR = /usr/local/share
 PREFIX = $(DESTDIR)/autonomy_leds_avr
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = src/avr_time.c src/Descriptors.c $(LUFA_SRC_USB) $(LUFA_SRC_USBCLASS) $(APA_PATH)/light_apa102.c
+SRC = src/avr_time.c src/Descriptors.c $(LUFA_SRC_USB) $(LUFA_SRC_USBCLASS) 
+#$(APA_PATH)/light_apa102.c
 
 # List C++ source files here. (C dependencies are automatically generated.)
 CPPSRC = src/$(TARGET).cpp src/Atmega32u4Hardware.cpp $(ROSLIBDIR)/duration.cpp $(ROSLIBDIR)/time.cpp 
