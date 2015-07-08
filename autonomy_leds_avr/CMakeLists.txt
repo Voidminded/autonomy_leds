@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(autonomy_leds_avr)
 
+include(cmake/GetGitRevisionDescription.cmake)
+#git_describe(GIT_VERSION "--tags" "--abbrev=6")
+get_git_head_revision(GIT_REFSPEC GIT_VERSION)
+
 find_package(catkin REQUIRED COMPONENTS
   rosserial_client
   rosserial_msgs
@@ -28,7 +32,7 @@ ExternalProject_Add(autonomy_leds_firmware
   # Unfortunately the Makfile does not handle absolute paths to source files correctly,
   # since the OBJDIR treats everything as relative. The following is a nasty hack
   #BUILD_COMMAND make install ROSLIBDIR=${${PROJECT_NAME}_ROS_LIB_DIR} DESTDIR=${CATKIN_DEVEL_PREFIX}/share
-  BUILD_COMMAND make install ROSLIBDIR=../../../ros_lib DESTDIR=${CATKIN_DEVEL_PREFIX}/share
+  BUILD_COMMAND make install GIT_VERSION=${GIT_VERSION} ROSLIBDIR=../../../ros_lib DESTDIR=${CATKIN_DEVEL_PREFIX}/share
   INSTALL_COMMAND 
   BUILD_IN_SOURCE 1
 )

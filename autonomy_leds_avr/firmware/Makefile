@@ -135,6 +135,7 @@ LUFA_OPTS += -D USE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_ENAB
 include $(LUFA_PATH)/LUFA/makefile
 
 # Custom
+GIT_VERSION = $(shell git describe --abbrev=6 --dirty --always --tags)
 APA_PATH = ./thirdparty/Light_apa102
 ROSLIBDIR = ./ros_lib
 DESTDIR = /usr/local/share
@@ -262,6 +263,7 @@ CPPFLAGS += -Wundef
 CPPFLAGS += -Wa,-adhlns=$(<:%.cpp=$(OBJDIR)/%.lst)
 CPPFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 #CPPFLAGS += $(CSTANDARD)
+CPPFLAGS += -DGIT_VERSION="\"$(GIT_VERSION)\""
 
 
 #---------------- Assembler Options ----------------
