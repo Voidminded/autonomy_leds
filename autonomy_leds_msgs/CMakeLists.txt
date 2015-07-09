@@ -14,8 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   Command.msg
-  BGRInt8.msg
-  BGRVector.msg
   LED.msg
 )
 

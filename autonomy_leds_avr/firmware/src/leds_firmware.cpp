@@ -1,7 +1,7 @@
 /* ROS */
 #include "ros.h"
 #include "autonomy_leds_msgs/Command.h"
-// #include "autonomy_leds_msgs/LED.h"
+#include "autonomy_leds_msgs/LED.h"
 
 /* AVR */
 #include "Atmega32u4Hardware.h"
@@ -31,12 +31,11 @@ char log_str[MAX_MSG_SIZE];
 
 /* ROS */
 void set_cb(const autonomy_leds_msgs::Command& cmd_msg);
-// void clear_cb(const std_msgs::Empty& msg);
-// void set_led_cb(const autonomy_leds_msgs::LED& led_msg);
+void set_led_cb(const autonomy_leds_msgs::LED& led_msg);
 
 ros::NodeHandle nh;
 ros::Subscriber<autonomy_leds_msgs::Command> set_sub("leds/set", &set_cb);
-// ros::Subscriber<autonomy_leds_msgs::LED> set_led_sub("leds/set_led", &set_led_cb);
+ros::Subscriber<autonomy_leds_msgs::LED> set_led_sub("leds/set_led", &set_led_cb);
 
 int get_free_ram () {
   extern int __heap_start, *__brkval; 
@@ -51,6 +50,11 @@ inline void ack_led()
     PORTC ^= (1 << LED_PIN);
     _delay_ms(100);
   }
+}
+
+inline void clear_all_leds()
+{
+  apa102_setleds_packed(0, 255);
 }
 
 /* ROS Callbacks */
@@ -69,7 +73,7 @@ void set_cb(const autonomy_leds_msgs::Command& cmd_msg)
     case autonomy_leds_msgs::Command::FLAG_CLEAR:
     {
       // Clear everything, it should work even w/o a buffer
-      apa102_setleds_packed(0, 255);
+      clear_all_leds();
       ros_buffer_size = 0;
       break;  
     }
@@ -77,7 +81,7 @@ void set_cb(const autonomy_leds_msgs::Command& cmd_msg)
     {
       if (ros_buffer_size == 0) break;
       uint16_t buffer = ros_buffer_ptr[0];
-      for (led_counter = 0; led_counter < ros_buffer_size - 1; led_counter ++)
+      for (led_counter = 0; led_counter < ros_buffer_size - 1; led_counter++)
       {
         ros_buffer_ptr[led_counter] = ros_buffer_ptr[led_counter + 1];
       }
@@ -95,12 +99,32 @@ void set_cb(const autonomy_leds_msgs::Command& cmd_msg)
       }
       ros_buffer_ptr[led_counter] = buffer;
       apa102_setleds_packed(ros_buffer_ptr, ros_buffer_size);
-      break; 
+      break;
+    }
+    case autonomy_leds_msgs::Command::FLAG_INVERT:
+    {
+      if (ros_buffer_size == 0) break;
+      for (led_counter = 0; led_counter < ros_buffer_size; led_counter++)
+      {
+        ros_buffer_ptr[led_counter] ^= 0b0111111111111111;
+      }
+      apa102_setleds_packed(ros_buffer_ptr, ros_buffer_size);
+      break;
     }
   }
-  
+
+#ifdef PUBLISH_FREE_RAM 
   snprintf(log_str, MAX_MSG_SIZE, "%d", get_free_ram());
   nh.loginfo(log_str);
+#endif
+
+}
+
+void set_led_cb(const autonomy_leds_msgs::LED& led_msg)
+{
+  if (ros_buffer_ptr == 0 || led_msg.index >= ros_buffer_size) return;
+  ros_buffer_ptr[led_msg.index] = led_msg.color;
+  apa102_setleds_packed(ros_buffer_ptr, ros_buffer_size);
 }
 
 int main()
@@ -108,9 +132,13 @@ int main()
   /* IO */
   DDRC |= (1 << LED_PIN);
 
+  // Clear LEDs
+  clear_all_leds();
+
+  // Init ROS
   nh.initNode();
   nh.subscribe(set_sub);
-  // nh.subscribe(set_led_sub);
+  nh.subscribe(set_led_sub);
 
   ack_led();
 
@@ -127,12 +155,11 @@ int main()
   ack_led();
   
   // Publish some debug information
-  snprintf(log_str, MAX_MSG_SIZE, "%s", GIT_VERSION);
+  snprintf(log_str, MAX_MSG_SIZE, "V:%s", GIT_VERSION);
   nh.loginfo(log_str);
-  snprintf(log_str, MAX_MSG_SIZE, "%d", get_free_ram());
+  snprintf(log_str, MAX_MSG_SIZE, "FM:%d", get_free_ram());
   nh.loginfo(log_str);
 
-  // 50hz loop
   while(1)
   {
     nh.spinOnce();
