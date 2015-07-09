@@ -1,9 +1,8 @@
+# AVR only
 *.cof
 *.hex
-*.obj
 *.elf
 *.conf
-*.o
 *.bin
 *.lst
 *.map
@@ -12,3 +11,32 @@
 *.lss
 *.sym
 .dep/
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
