@@ -91,15 +91,10 @@ char log_str[MAX_MSG_SIZE];
 void set_cb(const autonomy_leds_msgs::Command& cmd_msg);
 // void clear_cb(const std_msgs::Empty& msg);
 // void set_led_cb(const autonomy_leds_msgs::LED& led_msg);
-// void shift_left_cb(const std_msgs::Empty& msg);
-// void shift_right_cb(const std_msgs::Empty& msg);
 
 ros::NodeHandle nh;
 ros::Subscriber<autonomy_leds_msgs::Command> set_sub("leds/set", &set_cb);
 // ros::Subscriber<autonomy_leds_msgs::LED> set_led_sub("leds/set_led", &set_led_cb);
-//ros::Subscriber<std_msgs::Empty> shift_left_sub("leds/shift_left", &shift_left_cb);
-//ros::Subscriber<std_msgs::Empty> shift_right_sub("leds/shift_right", &shift_right_cb);
-
 
 int get_free_ram () {
   extern int __heap_start, *__brkval; 
@@ -120,12 +115,12 @@ inline void ack_led()
 
 void set_cb(const autonomy_leds_msgs::Command& cmd_msg)
 {
-  ros_buffer_ptr = cmd_msg.colors_vec;
-  ros_buffer_size = cmd_msg.colors_vec_length;
   switch (cmd_msg.flag)
   {
     case autonomy_leds_msgs::Command::FLAG_SET_ALL:
     {
+      ros_buffer_ptr = cmd_msg.colors_vec;
+      ros_buffer_size = cmd_msg.colors_vec_length;
       apa102_setleds_ros(ros_buffer_ptr, ros_buffer_size);
       break;
     }
@@ -133,48 +128,38 @@ void set_cb(const autonomy_leds_msgs::Command& cmd_msg)
     {
       // Clear everything, it should work even w/o a buffer
       apa102_setleds_ros(0, 255);
+      ros_buffer_size = 0;
       break;  
+    }
+    case autonomy_leds_msgs::Command::FLAG_SHIFTLEFT:
+    {
+      if (ros_buffer_size == 0) break;
+      uint16_t buffer = ros_buffer_ptr[0];
+      for (led_counter = 0; led_counter < ros_buffer_size - 1; led_counter ++)
+      {
+        ros_buffer_ptr[led_counter] = ros_buffer_ptr[led_counter + 1];
+      }
+      ros_buffer_ptr[led_counter] = buffer;
+      apa102_setleds_ros(ros_buffer_ptr, ros_buffer_size);
+      break; 
+    }
+    case autonomy_leds_msgs::Command::FLAG_SHIFTRIGHT:
+    {
+      if (ros_buffer_size == 0) break;
+      uint16_t buffer = ros_buffer_ptr[ros_buffer_size - 1];
+      for (led_counter = ros_buffer_size - 1; led_counter > 0; led_counter--)
+      {
+        ros_buffer_ptr[led_counter] = ros_buffer_ptr[led_counter - 1];
+      }
+      ros_buffer_ptr[led_counter] = buffer;
+      apa102_setleds_ros(ros_buffer_ptr, ros_buffer_size);
+      break; 
     }
   }
   
   snprintf(log_str, MAX_MSG_SIZE, "%d", get_free_ram());
   nh.loginfo(log_str);
 }
-
-// void set_led_cb(const autonomy_leds_msgs::LED& led_msg)
-// {
-//   if (led_msg.index >= ros_buffer_size)
-//   {
-//     ack_led();
-//     return;
-//   }
-//   ros_buffer_ptr[led_msg.index].r = led_msg.color.r;
-//   ros_buffer_ptr[led_msg.index].g = led_msg.color.g;
-//   ros_buffer_ptr[led_msg.index].b = led_msg.color.b;
-//   apa102_setleds_ros(ros_buffer_ptr, ros_buffer_size);
-// }
-
-// void shift_left_cb(const std_msgs::Empty& msg)
-// {
-//   cRGB buffer = led_strip[0];
-//   for (led_counter = 0; led_counter < NUM_LEDS - 1; led_counter ++)
-//   {
-//     led_strip[led_counter] = led_strip[led_counter + 1];
-//   }
-//   led_strip[led_counter] = buffer;
-//   apa102_setleds(led_strip, NUM_LEDS);
-// }
-
-// void shift_right_cb(const std_msgs::Empty& msg)
-// {
-//   cRGB buffer = led_strip[NUM_LEDS - 1];
-//   for (led_counter = NUM_LEDS - 1; led_counter > 0; led_counter--)
-//   {
-//     led_strip[led_counter] = led_strip[led_counter - 1];
-//   }
-//   led_strip[led_counter] = buffer;
-//   apa102_setleds(led_strip, NUM_LEDS);
-// }
 
 int main()
 {
@@ -184,8 +169,6 @@ int main()
   nh.initNode();
   nh.subscribe(set_sub);
   // nh.subscribe(set_led_sub);
-  // nh.subscribe(shift_left_sub);
-  // nh.subscribe(shift_right_sub);
 
   ack_led();
 
