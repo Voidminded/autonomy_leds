@@ -78,12 +78,7 @@ void inline apa102_setleds(struct cRGB *ledarray, uint16_t leds)
   }
 }
 
-/* Custom Write Function to LED based on apa102 */
-
-#include <ros/ros.h>
-#include "autonomy_leds_msgs/BGRInt8.h"
-
-void inline apa102_setleds_ros(autonomy_leds_msgs::BGRInt8 *ledarray, uint16_t leds)
+void inline apa102_setleds_packed(uint16_t *ledarray, uint16_t leds)
 {
   uint16_t i;
   //uint8_t *rawarray=(uint8_t*)ledarray;
@@ -97,9 +92,9 @@ void inline apa102_setleds_ros(autonomy_leds_msgs::BGRInt8 *ledarray, uint16_t l
   for (i = 0; i < leds; i++)
   {
     SPI_write(0xff);  // Maximum global brightness
-    SPI_write(ledarray[i]->b);
-    SPI_write(ledarray[i]->g);
-    SPI_write(ledarray[i]->r);
+    SPI_write(ledarray ? (uint8_t) ((ledarray[i] & 0b0111110000000000) >> 7) : 0);
+    SPI_write(ledarray ? (uint8_t) ((ledarray[i] & 0b0000001111100000) >> 2) : 0);
+    SPI_write(ledarray ? (uint8_t) ((ledarray[i] & 0b0000000000011111) << 3) : 0);
   }
   
   // End frame: 8+8*(leds >> 4) clock cycles    

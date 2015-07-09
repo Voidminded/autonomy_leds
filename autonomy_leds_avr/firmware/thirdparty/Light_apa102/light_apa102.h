@@ -27,7 +27,8 @@
  *         - Send out the LED data 
  */
 
-void apa102_setleds    (struct cRGB *ledarray, uint16_t number_of_leds);
+void apa102_setleds        (struct cRGB *ledarray, uint16_t number_of_leds);
+void apa102_setleds_packed (uint16_t *ledarray, uint16_t leds);
 
 /*
  * Internal defines

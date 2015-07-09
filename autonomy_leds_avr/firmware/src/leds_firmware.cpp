@@ -26,64 +26,6 @@ uint8_t led_counter = 0;
 uint16_t* ros_buffer_ptr = 0;
 uint8_t ros_buffer_size = 0;
 
-/* Custom Write Function to LED based on apa102 */
-#define nop() asm volatile(" nop \n\t")
-
-inline void SPI_init(void) {
-  apa102_DDRREG  |=  _BV(apa102_data);
-  apa102_DDRREG  |=  _BV(apa102_clk);
-  apa102_PORTREG &= ~_BV(apa102_clk);  // initial state of clk is low
-}
-
-// Assumed state before call: SCK- Low, MOSI- High
-void SPI_write(uint8_t c) {
-  uint8_t i;
-  for (i=0; i<8 ;i++)
-  {
-    if (!(c&0x80)) {
-      apa102_PORTREG &= ~_BV(apa102_data); // set data low
-    } else {
-      apa102_PORTREG |=  _BV(apa102_data); // set data high
-    }     
-  
-  apa102_PORTREG |= (1<< apa102_clk); // SCK hi , data sampled here
-
-  c<<=1;
-  
-  nop();  // Stretch clock
-  nop();
-  
-  apa102_PORTREG &= ~_BV(apa102_clk); // clk low
-  }
-// State after call: SCK Low, Dat high
-}
-
-void inline apa102_setleds_ros(uint16_t *ledarray, uint16_t leds)
-{
-  uint16_t i;
-  //uint8_t *rawarray=(uint8_t*)ledarray;
-  SPI_init();
-  
-  SPI_write(0x00);  // Start Frame
-  SPI_write(0x00);
-  SPI_write(0x00);
-  SPI_write(0x00);
- 
-  for (i = 0; i < leds; i++)
-  {
-    SPI_write(0xff);  // Maximum global brightness
-    SPI_write(ledarray ? uint8_t((ledarray[i] & 0b0111110000000000) >> 7) : 0);
-    SPI_write(ledarray ? uint8_t((ledarray[i] & 0b0000001111100000) >> 2) : 0);
-    SPI_write(ledarray ? uint8_t((ledarray[i] & 0b0000000000011111) << 3) : 0);
-  }
-  
-  // End frame: 8+8*(leds >> 4) clock cycles    
-  for (i=0; i<leds; i+=16)
-  {
-    SPI_write(0xff);  // 8 more clock cycles
-  }
-}
-
 /* Other variables */
 char log_str[MAX_MSG_SIZE];
 
@@ -121,13 +63,13 @@ void set_cb(const autonomy_leds_msgs::Command& cmd_msg)
     {
       ros_buffer_ptr = cmd_msg.colors_vec;
       ros_buffer_size = cmd_msg.colors_vec_length;
-      apa102_setleds_ros(ros_buffer_ptr, ros_buffer_size);
+      apa102_setleds_packed(ros_buffer_ptr, ros_buffer_size);
       break;
     }
     case autonomy_leds_msgs::Command::FLAG_CLEAR:
     {
       // Clear everything, it should work even w/o a buffer
-      apa102_setleds_ros(0, 255);
+      apa102_setleds_packed(0, 255);
       ros_buffer_size = 0;
       break;  
     }
@@ -140,7 +82,7 @@ void set_cb(const autonomy_leds_msgs::Command& cmd_msg)
         ros_buffer_ptr[led_counter] = ros_buffer_ptr[led_counter + 1];
       }
       ros_buffer_ptr[led_counter] = buffer;
-      apa102_setleds_ros(ros_buffer_ptr, ros_buffer_size);
+      apa102_setleds_packed(ros_buffer_ptr, ros_buffer_size);
       break; 
     }
     case autonomy_leds_msgs::Command::FLAG_SHIFTRIGHT:
@@ -152,7 +94,7 @@ void set_cb(const autonomy_leds_msgs::Command& cmd_msg)
         ros_buffer_ptr[led_counter] = ros_buffer_ptr[led_counter - 1];
       }
       ros_buffer_ptr[led_counter] = buffer;
-      apa102_setleds_ros(ros_buffer_ptr, ros_buffer_size);
+      apa102_setleds_packed(ros_buffer_ptr, ros_buffer_size);
       break; 
     }
   }
