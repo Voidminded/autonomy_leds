@@ -16,6 +16,9 @@
 
 
   <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>gcc-avr</buildtool_depend>
+  <buildtool_depend>avr-libc</buildtool_depend>
+
   <build_depend>rosserial_client</build_depend>
   <build_depend>rosserial_msgs</build_depend>
   <build_depend>autonomy_leds_msgs</build_depend>
