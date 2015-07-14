@@ -1,6 +1,6 @@
 # autonomy_leds
 
-Firmware and tools to interface with autonomy_lab's LED strip driver.
+Firmware and tools to interface with Autonomy Lab's LED strip driver.
 
 ## Packages
 
@@ -10,7 +10,7 @@ Firmware and tools to interface with autonomy_lab's LED strip driver.
 
 ## Compile instructions
 
-Instructions on how to build the whole stack is provided in `autonomy_leds_avr/README.md` file. If you do not need to [cross] compile the firmware (i.e. you only need to use a pre-programmed board), follow the same instructions and put an empty `.CATKIN_IGNORE` file inside `autonomy_leds_avr` folder after cloning it. That will prevent the compilation of the firmware. 
+Instructions on how to build the whole stack is provided in `autonomy_leds_avr/README.md` file. If you do not need to [cross] compile the firmware (i.e. you only need to use the pre-programmed board), follow the same instructions but put an empty `.CATKIN_IGNORE` file inside `autonomy_leds_avr` folder after cloning it. That will prevent catkin from [cross] compiling the firmware.
 
 ## Running the driver
 
@@ -20,22 +20,24 @@ Instructions on how to build the whole stack is provided in `autonomy_leds_avr/R
 $ rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0 _baud:=115200
 ```
 
-## Color encoding information
-
-Please refer to `autonomy_leds_msgs/msg/Command.msg` file.
-
 ## Using the low-level API
 
 ### Setting individual LEDs
 
-To set an individual LED, set the _index_ and _color_ in a message of type `autonomy_leds_msgs/LED` and publish it to `leds/set_led` topic.
+To set an individual LED, set the _index_ and _color_ of a message of type `autonomy_leds_msgs/LED` to your desired values, then publish it to `leds/set_led` topic.
 
 ### Changing the values of all LEDs
 
-Messages published to `leds/set` topic set/manipulate the value of all LEDs in one go. The type of these messages are `autonomy_leds_msgs/Command`. The `flag` field of this message specifies the command:
+Messages published to `leds/set` topic set/manipulate the value of all LEDs in one go. These messages are of type `autonomy_leds_msgs/Command`. The `flag` field of this message specifies the desired action:
 
-- `flag = 0 (FLAG_SET_ALL)` will set the RGB value of each LED based on the values of the vector specified by `colors_vec` field. Each color is a 16 bit value. The encoding is described in _color encoding infomation_ section.
+- `flag = 0 (FLAG_SET_ALL)` will set the RGB value of each LED based on the color specified by `colors_vec` vector. Each color is a 16 bit value. The encoding is described in _color encoding infomation_ section.
 - `flag = 1 (FLAG_CLEAR)` clears the LED strip
-- `flag = 2 (FLAG_SHIFTLEFT)` performs a circular shift left on the LED strip
-- `flag = 3 (FLAG_SHIFTRIGHT)` performs a circular shift right on the LED strip
+- `flag = 2 (FLAG_SHIFTLEFT)` performs a circular shift left on all LEDS
+- `flag = 3 (FLAG_SHIFTRIGHT)` performs a circular shift right on all LEDS
 - `flag = 4 (FLAG_INVERT)` inverts the color of all LEDs
+
+Check `autonomy_leds_tools/scripts/test.py` file for some demo material.
+
+## Color encoding information
+
+Please refer to `autonomy_leds_msgs/msg/Command.msg` file.

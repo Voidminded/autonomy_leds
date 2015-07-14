@@ -10,7 +10,7 @@ Driver board: TBA
 
 ## udev rules
 
-Please install the udev rule file in `autonomy_leds_tools/udev` to your system based on the instruction provided by the accompanying README file. These rules give any user in `dialout` group on the host machine access to the driver board over USB without root access, both for programming it and interfacing with it.
+Please install the udev rule file located in `autonomy_leds_tools/udev` to your system based on instructions provided by the accompanying README file. These rules give any user in `dialout` group on the host machine access to the driver board over USB, both for programming it and interfacing with it.
 
 ## Firmware Build Instructions
 
@@ -23,7 +23,7 @@ Pre-requirements:
 ```bash
 $ mkdir -p ~/autonomy_leds_ws/src
 $ cd ~/autonomy_leds_ws
-$ catkin int
+$ catkin init
 $ cd src
 $ git clone https://github.com/AutonomyLab/autonomy_leds
 $ cd ..
