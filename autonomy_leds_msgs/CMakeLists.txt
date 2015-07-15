@@ -15,6 +15,8 @@ add_message_files(
   FILES
   Command.msg
   LED.msg
+  Keyframe.msg
+  Animation.msg
 )
 
 ## Generate services in the 'srv' folder
