@@ -76,7 +76,7 @@ void AnimationEngine::DisplayFrame(const autonomy_leds_msgs::Keyframe &kf, const
 {
   leds_msg_.flag = autonomy_leds_msgs::Command::FLAG_SET_ALL;
   uint32_t index = 0;
-  while (index < kf.start_index && clear) leds_msg_.colors_vec[index++] = 0;
+  while (index < kf.start_index && index < num_leds_ && clear) leds_msg_.colors_vec[index++] = 0;
   index = kf.start_index;
   for (uint32_t i = 0; i < kf.pattern_repeat && index < num_leds_; i++)
   {

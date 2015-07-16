@@ -12,6 +12,9 @@
   <node pkg="rosserial_python" type="message_info_service.py" 
     name="rosserial_message_info" />
   <node pkg="autonomy_leds_tools" type="leds_animation_engine_node" 
-    name="leds_animation_engine_node" output="screen"/>
+    name="leds_animation_engine_node" output="screen">
+    <param name="update_rate" value="25" />
+    <param name="num_leds" value="60" />
+  </node>
 
 </launch>

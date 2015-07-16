@@ -1,5 +1,6 @@
 #include <boost/bind.hpp>
 #include <exception>
+#include <string>
 
 #include <ros/ros.h>
 
@@ -22,8 +23,8 @@ public:
       private_nh_("~"),
       kf_sub_(nh_.subscribe("leds/display", 30, &AnimationEngineNode::DisplayFrameCallback, this)),
       anim_sub_(nh_.subscribe("leds/animation", 5, &AnimationEngineNode::AnimationCallback, this)),
-      update_rate_(private_nh_.param("update_rate", 25.0)),
-      anim_engine_(nh_, private_nh_.param("num_leds", 50))
+      update_rate_(private_nh_.param<double>(std::string("update_rate"), 25.0)),
+      anim_engine_(nh_, private_nh_.param<int>(std::string("num_leds"), 50))
   {
     ;
   }
