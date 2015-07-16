@@ -41,7 +41,7 @@ def main():
     time.sleep(1.0)
 
     rospy.loginfo("Two frame animation test ...")    
-    anim_msg.iteration_count = 20
+    anim_msg.iteration_count = 0
     anim_msg.smooth_transition = True
     anim_msg.transition_duration = 2.0
     anim_msg.timing_function = Animation.TIMING_FUNCTION_EASE_INOUT

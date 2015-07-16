@@ -28,7 +28,7 @@ $ cd src
 $ git clone https://github.com/AutonomyLab/autonomy_leds
 $ cd ..
 $ rosdep update && rosdep install --from-paths src -i
-$ catkin build
+$ catkin build -DCMAKE_BUILD_TYPE=RelWithDebInfo
 ```
 
 The above procedure will install all required system-wide dependencies using `rosdep`. There is no need to do the `rosdep` step on recompiles. The hex file for the firmware (`leds_firmware.hex`) will be placed in `autonomy_leds_ws/devel/share/autonomy_leds_avr/firmware` after successful compilation.
