@@ -23,9 +23,18 @@ inline uint8_t cc2int8(const float& c) {
   return static_cast<uint8_t> (255.0f * std::max(0.0f, std::min(c, 1.0f)));
 }
 
+template <typename T> inline T clamp (T x, T a, T b)
+{
+    return ((x) > (a) ? ((x) < (b) ? (x) : (b)) : (a));
+}
+
+// t is normalized wrt to duration so it is in [0..1] range (t = t_actual / duration)
+double interpolate(double t, const double start, const double diff, const uint8_t itype);
+
 uint16_t RGBAToPackedBGR(const std_msgs::ColorRGBA& color);
 
 }  // namespace util
+
 
 class AnimationEngine
 {
@@ -45,6 +54,7 @@ protected:
   uint32_t num_leds_;
   autonomy_leds_msgs::AnimationConstPtr anim_ptr_;
   ENGINE_STATES state_;
+  ENGINE_STATES prev_state_;
   uint16_t kf_index_;
   ros::Time kf_start_time_;
   ros::Time transition_start_time_;
@@ -58,7 +68,13 @@ protected:
 private:
   autonomy_leds_msgs::Command clear_msg_;
   autonomy_leds_msgs::Command leds_msg_;
+
   autonomy_leds_msgs::Keyframe transition_kf_;
+  // Since diff values can be negative, we can't piggy back on KeyFrame message
+  int32_t diff_index;
+  int32_t diff_repeat;
+  autonomy_leds_msgs::Keyframe::_color_pattern_type diff_color;
+
 
 public:
   AnimationEngine(ros::NodeHandle& nh, const uint16_t num_leds);

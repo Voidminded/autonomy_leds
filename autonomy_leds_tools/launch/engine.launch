@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<launch>
+  <node pkg="rosserial_server" type="serial_node" name="rosserial_server">
+    <rosparam>
+      port: /dev/ttyACM0
+      baud: 115200
+      require:
+        publishers: []    
+        subscribers: [leds/set, leds/set_led]    
+    </rosparam>
+  </node>
+  <node pkg="rosserial_python" type="message_info_service.py" 
+    name="rosserial_message_info" />
+  <node pkg="autonomy_leds_tools" type="leds_animation_engine_node" 
+    name="leds_animation_engine_node" output="screen"/>
+
+</launch>

@@ -43,25 +43,38 @@ def main():
     rospy.loginfo("Two frame animation test ...")    
     anim_msg.iteration_count = 20
     anim_msg.smooth_transition = True
-    anim_msg.transition_duration = 1.0
+    anim_msg.transition_duration = 2.0
+    anim_msg.timing_function = Animation.TIMING_FUNCTION_EASE_INOUT
     keyframe_msg.color_pattern = []    
-    color_msg.r = 0.5
+    color_msg.r = 0.1
     color_msg.g = 0.0
     color_msg.b = 0.0
     keyframe_msg.color_pattern.append(copy.deepcopy(color_msg))
-    keyframe_msg.pattern_repeat = 0
+    keyframe_msg.pattern_repeat = 1
     keyframe_msg.start_index = 0
-    keyframe_msg.duration = 0.1    
+    keyframe_msg.duration = 0.5
     anim_msg.keyframes.append(copy.deepcopy(keyframe_msg))
 
     keyframe_msg.color_pattern = []    
     color_msg.r = 0.0
-    color_msg.g = 0.5
-    color_msg.b = 0.5
+    color_msg.g = 0.9
+    color_msg.b = 0.9
     keyframe_msg.color_pattern.append(copy.deepcopy(color_msg))
-    keyframe_msg.pattern_repeat = 45
+    keyframe_msg.pattern_repeat = 50
     keyframe_msg.start_index = 0
-    keyframe_msg.duration = 0.1
+    keyframe_msg.duration = 0.5
+    
+    anim_msg.keyframes.append(copy.deepcopy(keyframe_msg))
+
+
+    keyframe_msg.color_pattern = []
+    color_msg.r = 0.0
+    color_msg.g = 0.9
+    color_msg.b = 0.0
+    keyframe_msg.color_pattern.append(copy.deepcopy(color_msg))
+    keyframe_msg.pattern_repeat = 10
+    keyframe_msg.start_index = 40
+    keyframe_msg.duration = 0.5
     
     anim_msg.keyframes.append(copy.deepcopy(keyframe_msg))
 

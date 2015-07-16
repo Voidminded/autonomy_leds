@@ -22,7 +22,7 @@ public:
       private_nh_("~"),
       kf_sub_(nh_.subscribe("leds/display", 30, &AnimationEngineNode::DisplayFrameCallback, this)),
       anim_sub_(nh_.subscribe("leds/animation", 5, &AnimationEngineNode::AnimationCallback, this)),
-      update_rate_(private_nh_.param("update_rate", 30.0)),
+      update_rate_(private_nh_.param("update_rate", 25.0)),
       anim_engine_(nh_, private_nh_.param("num_leds", 50))
   {
     ;
@@ -30,13 +30,13 @@ public:
 
   void DisplayFrameCallback(const autonomy_leds_msgs::KeyframeConstPtr& kf_ptr)
   {
-    ROS_INFO("Request to display a frame received ...");
+    ROS_DEBUG("Request to display a frame received ...");
     anim_engine_.ShowSingleFrame(kf_ptr);
   }
 
   void AnimationCallback(const autonomy_leds_msgs::AnimationConstPtr& anim_ptr)
   {
-    ROS_INFO("Request to display an animation received ...");
+    ROS_DEBUG("Request to display an animation received ...");
     anim_engine_.SetAnimation(anim_ptr);
   }
 
