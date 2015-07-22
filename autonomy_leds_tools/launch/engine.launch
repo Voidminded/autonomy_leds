@@ -2,7 +2,7 @@
 <launch>
   <node pkg="rosserial_server" type="serial_node" name="rosserial_server">
     <rosparam>
-      port: /dev/ttyACM0
+      port: /dev/led_strip
       baud: 115200
       require:
         publishers: []    

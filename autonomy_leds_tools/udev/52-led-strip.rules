@@ -2,9 +2,8 @@
 
 ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2044", ENV{ID_MM_DEVICE_IGNORE}="1"
 ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2044", ENV{MTP_NO_PROBE}="1"
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2044", GROUP:="dialout"
-KERNEL=="ttyACM0", ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2044", GROUP:="dialout"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2044", GROUP:="dialout", SYMLINK+="led_strip"
 
 # DFU bootloader mode
 
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2ff4", GROUP:="dialout"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2ff4", GROUP:="dialout", SYMLINK+="led_strip_dfu"

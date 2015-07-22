@@ -17,7 +17,7 @@ Instructions on how to build the whole stack is provided in `autonomy_leds_avr/R
 (One time only) Please install provided udev rules in `autonomy_leds_tools/udev` based on the accompanying README file.
 
 ```bash
-$ rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0 _baud:=115200
+$ rosrun rosserial_python serial_node.py _port:=/dev/led_strip _baud:=115200
 ```
 
 ## Using the low-level API
