@@ -38,9 +38,9 @@ ros::Subscriber<autonomy_leds_msgs::Command> set_sub("leds/set", &set_cb);
 ros::Subscriber<autonomy_leds_msgs::LED> set_led_sub("leds/set_led", &set_led_cb);
 
 int get_free_ram () {
-  extern int __heap_start, *__brkval; 
-  int v; 
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
+  extern int __heap_start, *__brkval;
+  int v;
+  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
 inline void ack_led()
@@ -75,7 +75,7 @@ void set_cb(const autonomy_leds_msgs::Command& cmd_msg)
       // Clear everything, it should work even w/o a buffer
       clear_all_leds();
       ros_buffer_size = 0;
-      break;  
+      break;
     }
     case autonomy_leds_msgs::Command::FLAG_SHIFTLEFT:
     {
@@ -87,7 +87,7 @@ void set_cb(const autonomy_leds_msgs::Command& cmd_msg)
       }
       ros_buffer_ptr[led_counter] = buffer;
       apa102_setleds_packed(ros_buffer_ptr, ros_buffer_size);
-      break; 
+      break;
     }
     case autonomy_leds_msgs::Command::FLAG_SHIFTRIGHT:
     {
@@ -113,7 +113,7 @@ void set_cb(const autonomy_leds_msgs::Command& cmd_msg)
     }
   }
 
-#ifdef PUBLISH_FREE_RAM 
+#ifdef PUBLISH_FREE_RAM
   snprintf(log_str, MAX_MSG_SIZE, "%d", get_free_ram());
   nh.loginfo(log_str);
 #endif
@@ -129,10 +129,24 @@ void set_led_cb(const autonomy_leds_msgs::LED& led_msg)
 
 int main()
 {
-  /* IO */
-  DDRC |= (1 << LED_PIN);
+  // SET single LED port
+  DDRC |= _BV(LED_PIN);
+  PORTC ^= _BV(LED_PIN);
+  // 1s pull up of LED Strip pins */
+  apa102_DDRREG &= ~_BV(apa102_data);
+  apa102_DDRREG &= ~_BV(apa102_clk);
+  apa102_PORTREG |= _BV(apa102_data);
+  apa102_PORTREG |= _BV(apa102_clk);
+  _delay_ms(900);
+  // Disable pull ups
+  apa102_PORTREG &= ~_BV(apa102_data);
+  apa102_PORTREG &= ~_BV(apa102_clk);
+  apa102_DDRREG |= _BV(apa102_data);
+  apa102_DDRREG |= _BV(apa102_clk);
+  _delay_ms(100);
+  PORTC ^= _BV(LED_PIN);
 
-  // Clear LEDs
+  // Clear LEDs in the strip
   clear_all_leds();
 
   // Init ROS
@@ -153,7 +167,7 @@ int main()
   }
 
   ack_led();
-  
+
   // Publish some debug information
   snprintf(log_str, MAX_MSG_SIZE, "V:%s", GIT_VERSION);
   nh.loginfo(log_str);
