@@ -4,7 +4,7 @@ from autonomy_leds_msgs.msg import Animation, Keyframe, Command
 from std_msgs.msg import ColorRGBA
 import time, copy
 
-num_leds = 150
+num_leds = 180
 
 def main():
     display_pub = rospy.Publisher('leds/display', Keyframe, queue_size=10)
@@ -33,18 +33,18 @@ def main():
     color_msg.g = 0.5
     color_msg.b = 0.5
     keyframe_msg.color_pattern.append(copy.deepcopy(color_msg))
-    keyframe_msg.pattern_repeat = 5
+    keyframe_msg.pattern_repeat = num_leds / 3
     keyframe_msg.start_index = 0
-    keyframe_msg.duration = 1.0
+    keyframe_msg.duration = 5.0
     display_pub.publish(keyframe_msg)
 
-    time.sleep(1.0)
+    time.sleep(5.0)
 
-    rospy.loginfo("Two frame animation test ...")    
+    rospy.loginfo("Three frame animation test ...")    
     anim_msg.iteration_count = 0
     anim_msg.smooth_transition = True
-    anim_msg.transition_duration = 2.0
-    anim_msg.timing_function = Animation.TIMING_FUNCTION_EASE_INOUT
+    anim_msg.transition_duration = 4.0
+    anim_msg.timing_function = 0#Animation.TIMING_FUNCTION_EASE_INOUT
     keyframe_msg.color_pattern = []    
     color_msg.r = 0.1
     color_msg.g = 0.0
@@ -60,7 +60,7 @@ def main():
     color_msg.g = 0.9
     color_msg.b = 0.9
     keyframe_msg.color_pattern.append(copy.deepcopy(color_msg))
-    keyframe_msg.pattern_repeat = 50
+    keyframe_msg.pattern_repeat = num_leds
     keyframe_msg.start_index = 0
     keyframe_msg.duration = 0.5
     
@@ -73,10 +73,10 @@ def main():
     color_msg.b = 0.0
     keyframe_msg.color_pattern.append(copy.deepcopy(color_msg))
     keyframe_msg.pattern_repeat = 10
-    keyframe_msg.start_index = 40
+    keyframe_msg.start_index = num_leds - 10
     keyframe_msg.duration = 0.5
     
-    anim_msg.keyframes.append(copy.deepcopy(keyframe_msg))
+    #anim_msg.keyframes.append(copy.deepcopy(keyframe_msg))
 
     anim_pub.publish(anim_msg)
     time.sleep(1)

@@ -79,8 +79,9 @@ private:
 public:
   AnimationEngine(ros::NodeHandle& nh, const uint16_t num_leds);
 
-  void ClearLEDS();
+  inline uint16_t GetNumLEDs() const {return num_leds_;}
 
+  void ClearLEDS();
   void Reset();
   void Restart();
   void ShowSingleFrame(const autonomy_leds_msgs::KeyframeConstPtr& frame_ptr);

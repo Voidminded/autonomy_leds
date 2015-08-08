@@ -26,18 +26,18 @@ public:
       update_rate_(private_nh_.param<double>(std::string("update_rate"), 25.0)),
       anim_engine_(nh_, private_nh_.param<int>(std::string("num_leds"), 50))
   {
-    ;
+    ROS_WARN_STREAM("[ANIM] Number of LEDs: " << anim_engine_.GetNumLEDs() << " Update Rate: " << update_rate_ << " Hz");
   }
 
   void DisplayFrameCallback(const autonomy_leds_msgs::KeyframeConstPtr& kf_ptr)
   {
-    ROS_DEBUG("Request to display a frame received ...");
+    ROS_DEBUG("[ANIM] Request to display a frame received ...");
     anim_engine_.ShowSingleFrame(kf_ptr);
   }
 
   void AnimationCallback(const autonomy_leds_msgs::AnimationConstPtr& anim_ptr)
   {
-    ROS_DEBUG("Request to display an animation received ...");
+    ROS_DEBUG("[ANIM] Request to display an animation received ...");
     anim_engine_.SetAnimation(anim_ptr);
   }
 
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 
   AnimationEngineNode anim_node(nh);
 
-  ROS_INFO("LEDS Animation Engine started ...");
+  ROS_INFO("[ANIM] LEDS Animation Engine started ...");
 
   anim_node.Spin();
 

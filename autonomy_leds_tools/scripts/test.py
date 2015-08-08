@@ -4,7 +4,7 @@ from autonomy_leds_msgs.msg import Command, LED
 
 import time
 
-num_leds = 150
+num_leds = 180
 
 def main():
     set_pub = rospy.Publisher('leds/set', Command, queue_size=10)
