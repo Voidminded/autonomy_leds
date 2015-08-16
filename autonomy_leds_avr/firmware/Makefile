@@ -137,15 +137,18 @@ include $(LUFA_PATH)/LUFA/makefile
 # Custom
 GIT_VERSION = $(shell git describe --abbrev=6 --dirty --always --tags)
 APA_PATH = ./thirdparty/Light_apa102
-ROSLIBDIR = ./ros_lib
-DESTDIR = /usr/local/share
+I2C_PATH = ./thirdparty/i2c-master-lib
+LL2_PATH = ./thirdparty/LIDARLiteV2
+ROSLIBDIR = ./ros_li
+bDESTDIR = /usr/local/share
 PREFIX = $(DESTDIR)/autonomy_leds_avr
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = src/avr_time.c src/Descriptors.c $(LUFA_SRC_USB) $(LUFA_SRC_USBCLASS) $(APA_PATH)/light_apa102.c
+SRC = src/avr_time.c src/Descriptors.c $(LUFA_SRC_USB) $(LUFA_SRC_USBCLASS) $(APA_PATH)/light_apa102.
+c $(I2C_PATH)/i2c_master.c 
 
 # List C++ source files here. (C dependencies are automatically generated.)
-CPPSRC = src/$(TARGET).cpp src/Atmega32u4Hardware.cpp $(ROSLIBDIR)/duration.cpp $(ROSLIBDIR)/time.cpp 
+CPPSRC = src/$(TARGET).cpp src/Atmega32u4Hardware.cpp $(ROSLIBDIR)/duration.cpp $(ROSLIBDIR)/time.cpp $(LL2_PATH)/LIDARLite.cpp
 
 # List Assembler source files here.
 #     Make them always end in a capital .S.  Files ending in a lowercase .s
@@ -174,7 +177,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = $(LUFA_PATH)/ $(ROSLIBDIR)/ $(APA_PATH) ./include
+EXTRAINCDIRS = $(LUFA_PATH)/ $(ROSLIBDIR)/ $(APA_PATH) ./include $(I2C_PATH) $(LL2_PATH)
 
 
 # Compiler flag to set the C Standard level.
