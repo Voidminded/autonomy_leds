@@ -2,9 +2,11 @@
 #include "ros.h"
 #include "autonomy_leds_msgs/Command.h"
 #include "autonomy_leds_msgs/LED.h"
+#include "sensor_msgs/Range.h"
 
 /* AVR */
 #include "Atmega32u4Hardware.h"
+
 extern "C"
 {
     #include <util/delay.h>
@@ -12,6 +14,8 @@ extern "C"
     #include <avr/io.h>
     #include "light_apa102.h"
 }
+
+#include "LIDARLite.h"
 
 // Needed for AVR to use virtual functions
 extern "C" void __cxa_pure_virtual(void);
@@ -26,6 +30,9 @@ uint8_t led_counter = 0;
 uint16_t* ros_buffer_ptr = 0;
 uint8_t ros_buffer_size = 0;
 
+/* PulsedLite v2 LIDAR */
+LIDARLite lidar;
+
 /* Other variables */
 char log_str[MAX_MSG_SIZE];
 
@@ -34,8 +41,10 @@ void set_cb(const autonomy_leds_msgs::Command& cmd_msg);
 void set_led_cb(const autonomy_leds_msgs::LED& led_msg);
 
 ros::NodeHandle nh;
+sensor_msgs::Range range_msg;
 ros::Subscriber<autonomy_leds_msgs::Command> set_sub("leds/set", &set_cb);
 ros::Subscriber<autonomy_leds_msgs::LED> set_led_sub("leds/set_led", &set_led_cb);
+ros::Publisher range_pub("lidar/range", &range_msg);
 
 int get_free_ram () {
   extern int __heap_start, *__brkval;
@@ -129,6 +138,8 @@ void set_led_cb(const autonomy_leds_msgs::LED& led_msg)
 
 int main()
 {
+  avr_time_init();
+
   // SET single LED port
   DDRC |= _BV(LED_PIN);
   PORTC ^= _BV(LED_PIN);
@@ -149,10 +160,16 @@ int main()
   // Clear LEDs in the strip
   clear_all_leds();
 
+  // Init LIDAR
+  lidar.begin();
+  // lidar.beginContinuous(false);
+  _delay_ms(1000);
+
   // Init ROS
   nh.initNode();
   nh.subscribe(set_sub);
   nh.subscribe(set_led_sub);
+  nh.advertise(range_pub);
 
   ack_led();
 
@@ -168,6 +185,14 @@ int main()
 
   ack_led();
 
+  // LIDAR msg
+  uint32_t lasttime_lidar = avr_time_now();
+  range_msg.header.frame_id = "pulsedlight";
+  range_msg.radiation_type = 2;
+  range_msg.field_of_view = 0.0523598776; // 3 degrees
+  range_msg.min_range = 0.0f;
+  range_msg.max_range = 40.0f;
+
   // Publish some debug information
   snprintf(log_str, MAX_MSG_SIZE, "V:%s", GIT_VERSION);
   nh.loginfo(log_str);
@@ -175,11 +200,21 @@ int main()
   nh.loginfo(log_str);
 
   while(1)
-  {
-    nh.spinOnce();
-    // LUFA functions that need to be called frequently to keep USB alive
-    CDC_Device_USBTask(&Atmega32u4Hardware::VirtualSerial_CDC_Interface);
-    USB_USBTask();
+  {   
+    // ~50Hz publish rate for distance sensor
+    if(avr_time_now() - lasttime_lidar > 5)
+    {
+      range_msg.range = float(lidar.distance()) / 100.0;
+      range_pub.publish(&range_msg);
+      lasttime_lidar = avr_time_now();
+    }
+    else
+    {
+      nh.spinOnce();
+      // LUFA functions that need to be called frequently to keep USB alive
+      CDC_Device_USBTask(&Atmega32u4Hardware::VirtualSerial_CDC_Interface);
+      USB_USBTask();
+    }
   }
 
   return 0;

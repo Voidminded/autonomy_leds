@@ -7,9 +7,9 @@ Adapted from: https://github.com/mrjogo/rosserial_avr_tutorial/tree/lufa
 https://github.com/cpldcpu/light_ws2812/tree/master/light_apa102_AVR
 GPLv2 License
 
-## i2c-master-lib
-https://github.com/g4lvanix/I2C-master-lib
-(commit a38fe8df)
+## i2c
+https://github.com/jeremycole/avr/tree/master/i2c
+(commit dc244e2694)
 
 ## LIDARLight v2
 https://github.com/PulsedLight3D/LIDARLite_v2_Arduino_Library

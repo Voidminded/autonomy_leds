@@ -137,15 +137,15 @@ include $(LUFA_PATH)/LUFA/makefile
 # Custom
 GIT_VERSION = $(shell git describe --abbrev=6 --dirty --always --tags)
 APA_PATH = ./thirdparty/Light_apa102
-I2C_PATH = ./thirdparty/i2c-master-lib
+#I2C_PATH = ./thirdparty/i2c-master-lib
+I2C_PATH = ./thirdparty/i2c
 LL2_PATH = ./thirdparty/LIDARLiteV2
 ROSLIBDIR = ./ros_li
 bDESTDIR = /usr/local/share
 PREFIX = $(DESTDIR)/autonomy_leds_avr
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = src/avr_time.c src/Descriptors.c $(LUFA_SRC_USB) $(LUFA_SRC_USBCLASS) $(APA_PATH)/light_apa102.
-c $(I2C_PATH)/i2c_master.c 
+SRC = src/avr_time.c src/Descriptors.c $(LUFA_SRC_USB) $(LUFA_SRC_USBCLASS) $(APA_PATH)/light_apa102.c $(I2C_PATH)/i2c.c 
 
 # List C++ source files here. (C dependencies are automatically generated.)
 CPPSRC = src/$(TARGET).cpp src/Atmega32u4Hardware.cpp $(ROSLIBDIR)/duration.cpp $(ROSLIBDIR)/time.cpp $(LL2_PATH)/LIDARLite.cpp
