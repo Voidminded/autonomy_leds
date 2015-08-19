@@ -161,7 +161,8 @@ int main()
   clear_all_leds();
 
   // Init LIDAR
-  lidar.begin();
+  lidar.begin(0); 
+  
   // lidar.beginContinuous(false);
   _delay_ms(1000);
 
