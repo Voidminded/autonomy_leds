@@ -100,11 +100,21 @@ void LIDARLite::begin(uint8_t configuration, bool fasti2c, bool showErrorReporti
 void LIDARLite::configure(uint8_t configuration, uint8_t LidarLiteI2cAddress){
   switch (configuration){
     case 0: //  Default configuration
-    break;
+      write(0x00,0x00,LidarLiteI2cAddress);
+      break;
     case 1: //  Set aquisition count to 1/3 default value, faster reads, slightly
             //  noisier values
       write(0x04,0x00,LidarLiteI2cAddress);
-    break;
+      break;
+    case 2: //  Low noise, low sensitivity: Pulls decision criteria higher
+            //  above the noise, allows fewer false detections, reduces
+            //  sensitivity
+      write(0x1c,0x20,LidarLiteI2cAddress);
+      break;
+    case 3: //  High noise, high sensitivity: Pulls decision criteria into the
+            //  noise, allows more false detections, increses sensitivity
+      write(0x1c,0x60,LidarLiteI2cAddress);
+      break;
   }
 }
 
