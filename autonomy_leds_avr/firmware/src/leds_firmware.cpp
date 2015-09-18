@@ -23,6 +23,8 @@ void __cxa_pure_virtual(void) {}
 
 /* CONSTANTS */
 #define LED_PIN PC7
+#define LIDAR_EN PB5
+#define LIDAR_MODE PB4
 #define MAX_MSG_SIZE 8
 
 /* LED Memory */
@@ -140,9 +142,19 @@ int main()
 {
   avr_time_init();
 
-  // SET single LED port
+  // SET single LED port and turn the LED on
   DDRC |= _BV(LED_PIN);
-  PORTC ^= _BV(LED_PIN);
+  PORTC |= _BV(LED_PIN);
+
+  // Set LidarLite V2 Enable and Mode pins as input
+  // (Sets both az High-Z)
+  // LIDAR_EN is internally pulled up on the lidar side, so
+  // leaving it as float is totally fine.
+  // I am not sure about the mode select one though, the docs
+  // are a little vague, I leave it at as High-Z  for now,
+  // since it seems to be working fine
+  DDRB &= ~(_BV(LIDAR_EN) | _BV(LIDAR_MODE));
+
   // 1s pull up of LED Strip pins */
   apa102_DDRREG &= ~_BV(apa102_data);
   apa102_DDRREG &= ~_BV(apa102_clk);
@@ -155,14 +167,14 @@ int main()
   apa102_DDRREG |= _BV(apa102_data);
   apa102_DDRREG |= _BV(apa102_clk);
   _delay_ms(100);
-  PORTC ^= _BV(LED_PIN);
+  PORTC &= ~_BV(LED_PIN);
 
   // Clear LEDs in the strip
   clear_all_leds();
 
   // Init LIDAR
-  lidar.begin(0); 
-  
+  lidar.begin(0);
+
   // lidar.beginContinuous(false);
   _delay_ms(1000);
 
@@ -201,10 +213,11 @@ int main()
   nh.loginfo(log_str);
 
   while(1)
-  {   
+  {
     // ~50Hz publish rate for distance sensor
     if(avr_time_now() - lasttime_lidar > 5)
     {
+      range_msg.header.stamp = nh.now();
       range_msg.range = float(lidar.distance()) / 100.0;
       range_pub.publish(&range_msg);
       lasttime_lidar = avr_time_now();
