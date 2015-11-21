@@ -18,7 +18,7 @@ extern "C" void __cxa_pure_virtual(void);
 void __cxa_pure_virtual(void) {}
 
 /* CONSTANTS */
-#define LED_PIN PC7
+#define LED_PIN PB0
 #define MAX_MSG_SIZE 8
 
 /* LED Memory */
@@ -47,7 +47,7 @@ inline void ack_led()
 {
   for (led_counter = 0; led_counter < 6; led_counter++)
   {
-    PORTC ^= (1 << LED_PIN);
+    PORTB ^= (1 << LED_PIN);
     _delay_ms(100);
   }
 }
@@ -130,8 +130,8 @@ void set_led_cb(const autonomy_leds_msgs::LED& led_msg)
 int main()
 {
   // SET single LED port
-  DDRC |= _BV(LED_PIN);
-  PORTC ^= _BV(LED_PIN);
+  DDRB |= _BV(LED_PIN);
+  PORTB ^= _BV(LED_PIN);
   // 1s pull up of LED Strip pins */
   apa102_DDRREG &= ~_BV(apa102_data);
   apa102_DDRREG &= ~_BV(apa102_clk);
@@ -144,7 +144,7 @@ int main()
   apa102_DDRREG |= _BV(apa102_data);
   apa102_DDRREG |= _BV(apa102_clk);
   _delay_ms(100);
-  PORTC ^= _BV(LED_PIN);
+  PORTB ^= _BV(LED_PIN);
 
   // Clear LEDs in the strip
   clear_all_leds();
