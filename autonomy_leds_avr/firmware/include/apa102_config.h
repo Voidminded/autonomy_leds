@@ -16,9 +16,10 @@
 // Clk and Data have to be connected to the same port
 ///////////////////////////////////////////////////////////////////////
 
-#define apa102_port F     // Data and clk port
-#define apa102_data 5    // Data out pin
-#define apa102_clk  4    // Clk out pin
+#define apa102_port_data B     // Data and clk port
+#define apa102_port_clk B     // Data and clk port
+#define apa102_data 6    // Data out pin
+#define apa102_clk  5    // Clk out pin
 
 ///////////////////////////////////////////////////////////////////////
 // Define color byte order

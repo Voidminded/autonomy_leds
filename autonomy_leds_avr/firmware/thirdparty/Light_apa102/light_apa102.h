@@ -36,7 +36,10 @@ void apa102_setleds_packed (uint16_t *ledarray, uint16_t leds);
 #define CONCAT(a, b)            a ## b
 #define CONCAT_EXP(a, b)   CONCAT(a, b)
 
-#define apa102_PORTREG  CONCAT_EXP(PORT,apa102_port)
-#define apa102_DDRREG   CONCAT_EXP(DDR,apa102_port)
+#define apa102_PORTREG_DATA  CONCAT_EXP(PORT,apa102_port_data)
+#define apa102_DDRREG_DATA   CONCAT_EXP(DDR,apa102_port_data)
+
+#define apa102_PORTREG_CLK  CONCAT_EXP(PORT,apa102_port_clk)
+#define apa102_DDRREG_CLK   CONCAT_EXP(DDR,apa102_port_clk)
 
 #endif /* LIGHT_APA102_H_ */

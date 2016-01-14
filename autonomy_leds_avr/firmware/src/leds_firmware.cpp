@@ -18,7 +18,7 @@ extern "C" void __cxa_pure_virtual(void);
 void __cxa_pure_virtual(void) {}
 
 /* CONSTANTS */
-#define LED_PIN PB0
+#define LED_PIN PC7
 #define MAX_MSG_SIZE 8
 
 /* LED Memory */
@@ -47,7 +47,7 @@ inline void ack_led()
 {
   for (led_counter = 0; led_counter < 6; led_counter++)
   {
-    PORTB ^= (1 << LED_PIN);
+    PORTC ^= (1 << LED_PIN);
     _delay_ms(100);
   }
 }
@@ -130,21 +130,21 @@ void set_led_cb(const autonomy_leds_msgs::LED& led_msg)
 int main()
 {
   // SET single LED port
-  DDRB |= _BV(LED_PIN);
-  PORTB ^= _BV(LED_PIN);
+  DDRC |= _BV(LED_PIN);
+  PORTC ^= _BV(LED_PIN);
   // 1s pull up of LED Strip pins */
-  apa102_DDRREG &= ~_BV(apa102_data);
-  apa102_DDRREG &= ~_BV(apa102_clk);
-  apa102_PORTREG |= _BV(apa102_data);
-  apa102_PORTREG |= _BV(apa102_clk);
+  apa102_DDRREG_DATA &= ~_BV(apa102_data);
+  apa102_DDRREG_CLK &= ~_BV(apa102_clk);
+  apa102_PORTREG_DATA |= _BV(apa102_data);
+  apa102_PORTREG_CLK |= _BV(apa102_clk);
   _delay_ms(900);
   // Disable pull ups
-  apa102_PORTREG &= ~_BV(apa102_data);
-  apa102_PORTREG &= ~_BV(apa102_clk);
-  apa102_DDRREG |= _BV(apa102_data);
-  apa102_DDRREG |= _BV(apa102_clk);
+  apa102_PORTREG_DATA &= ~_BV(apa102_data);
+  apa102_PORTREG_CLK &= ~_BV(apa102_clk);
+  apa102_DDRREG_DATA |= _BV(apa102_data);
+  apa102_DDRREG_CLK |= _BV(apa102_clk);
   _delay_ms(100);
-  PORTB ^= _BV(LED_PIN);
+  PORTC ^= _BV(LED_PIN);
 
   // Clear LEDs in the strip
   clear_all_leds();

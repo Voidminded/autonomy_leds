@@ -24,9 +24,9 @@
 */
 
 inline void SPI_init(void) {
-  apa102_DDRREG  |=  _BV(apa102_data);
-  apa102_DDRREG  |=  _BV(apa102_clk);
-  apa102_PORTREG &= ~_BV(apa102_clk);  // initial state of clk is low
+  apa102_DDRREG_DATA  |=  _BV(apa102_data);
+  apa102_DDRREG_CLK  |=  _BV(apa102_clk);
+  apa102_PORTREG_CLK &= ~_BV(apa102_clk);  // initial state of clk is low
 }
 
 // Assumed state before call: SCK- Low, MOSI- High
@@ -35,19 +35,19 @@ void SPI_write(uint8_t c) {
   for (i=0; i<8 ;i++)
   {
     if (!(c&0x80)) {
-      apa102_PORTREG &= ~_BV(apa102_data); // set data low
+      apa102_PORTREG_DATA &= ~_BV(apa102_data); // set data low
     } else {
-      apa102_PORTREG |=  _BV(apa102_data); // set data high
+      apa102_PORTREG_DATA |=  _BV(apa102_data); // set data high
     }     
   
-  apa102_PORTREG |= (1<< apa102_clk); // SCK hi , data sampled here
+  apa102_PORTREG_CLK |= (1<< apa102_clk); // SCK hi , data sampled here
 
   c<<=1;
   
   nop();  // Stretch clock
   nop();
   
-  apa102_PORTREG &= ~_BV(apa102_clk); // clk low
+  apa102_PORTREG_CLK &= ~_BV(apa102_clk); // clk low
   }
 // State after call: SCK Low, Dat high
 }
