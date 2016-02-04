@@ -95,3 +95,14 @@ To see a demo of these APIs, you can check `autonomy_leds_tools/scripts/test_ani
 ```bash
 $ roslaunch autonomy_leds_tools engine.launch
 ```
+
+## Hardware
+
+### Pins Configuration
+```
+LED Str ->    CJMCU
+VCC     --    5V
+CI      --    D9
+DI      --    D10
+GND     --    GND
+```
