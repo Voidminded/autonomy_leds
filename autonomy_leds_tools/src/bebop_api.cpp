@@ -6,27 +6,6 @@
 
 #include "autonomy_leds_tools/bebop_api.h"
 
-/// REmove theese :
-
-//#include "autonomy_leds_msgs/Command.h"
-//#include "autonomy_leds_msgs/Keyframe.h"
-//#include "autonomy_leds_msgs/Animation.h"
-//#include "autonomy_leds_msgs/Directional.h"
-
-//#include <ros/ros.h>
-//#include <ros/time.h>
-
-//uint32_t num_leds_;
-//autonomy_leds_msgs::DirectionalConstPtr dir_ptr_;
-//autonomy_leds_msgs::Keyframe key_frame_;
-//double max_vel;
-//double max_view_ang;
-//ros::NodeHandle nh_;
-//ros::Subscriber cmd_sub_;
-//ros::Publisher kf_pub_;
-//autonomy_leds_msgs::Animation anim_;
-////////
-
 using namespace autonomy_leds;
 
 BebopAnimator::BebopAnimator(ros::NodeHandle& nh, const uint16_t num_leds)
@@ -47,7 +26,6 @@ BebopAnimator::BebopAnimator(ros::NodeHandle& nh, const uint16_t num_leds)
 
 void BebopAnimator::DirectionTranslatorCallback(const autonomy_leds_msgs::DirectionalConstPtr& dir_ptr)
 {
-    //    ROS_DEBUG("[BBP] Request to update the direction received ...");
     dir_ptr_ = dir_ptr;
     Process();
 }
@@ -114,7 +92,6 @@ void BebopAnimator::Process()
         if( dir_ptr_->value >= 0)
             key_frame_.color_pattern.push_back( dir_ptr_->center_color);
         int conv_val = (dir_ptr_->value/max_vel)*(num_leds_/2)+((dir_ptr_->value > 0) ? 1 : ((dir_ptr_->value < 0) ? -1 : 0));
-//        ROS_WARN_STREAM("[BBP] numLesd: " << num_leds_ << "Received vel:" << dir_ptr_->value << " converted Vel:" << conv_val);
         for( int i = 0; i < abs(conv_val); i++)
         {
             key_frame_.color_pattern.push_back( dir_ptr_->arrow_color);
@@ -195,13 +172,11 @@ void BebopAnimator::Process()
     anim_.iteration_count = 0;
     anim_.smooth_transition = true;
     anim_.transition_duration = 1.0/(dir_ptr_->freq/**anim_.keyframes.size()*/);
-//    anim_.timing_function = autonomy_leds_msgs::AnimationConstPtr::element_type::TIMING_FUNCTION_LINEAR;//TIMING_FUNCTION_EASE_OUT;
     anim_pub_.publish( anim_);
 }
 
 void BebopAnimator::SpinOnce()
 {
-//    Process();
     ros::spinOnce();
 }
 
