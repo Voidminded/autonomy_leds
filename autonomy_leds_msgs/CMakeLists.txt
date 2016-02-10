@@ -17,6 +17,7 @@ add_message_files(
   LED.msg
   Keyframe.msg
   Animation.msg
+  Directional.msg
 )
 
 ## Generate services in the 'srv' folder
