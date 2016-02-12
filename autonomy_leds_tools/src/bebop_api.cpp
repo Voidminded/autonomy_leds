@@ -10,7 +10,7 @@ using namespace autonomy_leds;
 
 BebopAnimator::BebopAnimator(ros::NodeHandle& nh, const uint16_t num_leds)
     : nh_(nh),
-      cmd_sub_(nh_.subscribe("leds/directional", 1, &BebopAnimator::DirectionTranslatorCallback, this)),
+      cmd_sub_(nh_.subscribe("leds/feedback", 1, &BebopAnimator::DirectionTranslatorCallback, this)),
       kf_pub_(nh_.advertise<autonomy_leds_msgs::Keyframe>("leds/display", 1)),
       anim_pub_(nh_.advertise<autonomy_leds_msgs::Animation>("leds/animation", 1))
 {
@@ -24,7 +24,7 @@ BebopAnimator::BebopAnimator(ros::NodeHandle& nh, const uint16_t num_leds)
     _cc.b = 0.0;
 }
 
-void BebopAnimator::DirectionTranslatorCallback(const autonomy_leds_msgs::DirectionalConstPtr& dir_ptr)
+void BebopAnimator::DirectionTranslatorCallback(const autonomy_leds_msgs::FeedbackConstPtr &dir_ptr)
 {
     dir_ptr_ = dir_ptr;
     Process();
@@ -34,7 +34,7 @@ void BebopAnimator::Process()
 {
     if( !dir_ptr_) return;
     anim_.keyframes.clear();
-    if( dir_ptr_->anim_type == autonomy_leds_msgs::DirectionalConstPtr::element_type::TYPE_CLEAR)
+    if( dir_ptr_->anim_type == autonomy_leds_msgs::FeedbackConstPtr::element_type::TYPE_CLEAR)
     {
         clear_frame_.color_pattern.clear();
         clear_frame_.color_pattern.push_back( _cc);
@@ -44,7 +44,7 @@ void BebopAnimator::Process()
         anim_.keyframes.push_back(clear_frame_);
         anim_.timing_function = autonomy_leds_msgs::AnimationConstPtr::element_type::TIMING_FUNCTION_LINEAR;
     }
-    else if( dir_ptr_->anim_type == autonomy_leds_msgs::DirectionalConstPtr::element_type::TYPE_LOOK_AT)
+    else if( dir_ptr_->anim_type == autonomy_leds_msgs::FeedbackConstPtr::element_type::TYPE_LOOK_AT)
     {
         clear_frame_.color_pattern.clear();
         clear_frame_.start_index = 0;
@@ -83,8 +83,8 @@ void BebopAnimator::Process()
             anim_.keyframes.push_back(clear_frame_);
         anim_.timing_function = autonomy_leds_msgs::AnimationConstPtr::element_type::TIMING_FUNCTION_LINEAR;//TIMING_FUNCTION_EASE_OUT;
     }
-    else if( dir_ptr_->anim_type == autonomy_leds_msgs::DirectionalConstPtr::element_type::TYPE_MOVE
-             || dir_ptr_->anim_type == autonomy_leds_msgs::DirectionalConstPtr::element_type::TYPE_MOVE_BLINK)
+    else if( dir_ptr_->anim_type == autonomy_leds_msgs::FeedbackConstPtr::element_type::TYPE_MOVE
+             || dir_ptr_->anim_type == autonomy_leds_msgs::FeedbackConstPtr::element_type::TYPE_MOVE_BLINK)
     {
         key_frame_.color_pattern.clear();
         clear_frame_.color_pattern.clear();
@@ -103,7 +103,7 @@ void BebopAnimator::Process()
         key_frame_.duration = 0;
         key_frame_.pattern_repeat = 1;
         anim_.keyframes.push_back(key_frame_);
-        if( dir_ptr_->anim_type == autonomy_leds_msgs::DirectionalConstPtr::element_type::TYPE_MOVE_BLINK)
+        if( dir_ptr_->anim_type == autonomy_leds_msgs::FeedbackConstPtr::element_type::TYPE_MOVE_BLINK)
         {
             clear_frame_.start_index = key_frame_.start_index;
             clear_frame_.duration = key_frame_.duration;
@@ -112,7 +112,7 @@ void BebopAnimator::Process()
         }
         anim_.timing_function = autonomy_leds_msgs::AnimationConstPtr::element_type::TIMING_FUNCTION_EASE_OUT;
     }
-    else if( dir_ptr_->anim_type == autonomy_leds_msgs::DirectionalConstPtr::element_type::TYPE_FULL_BLINK)
+    else if( dir_ptr_->anim_type == autonomy_leds_msgs::FeedbackConstPtr::element_type::TYPE_FULL_BLINK)
     {
         key_frame_.color_pattern.clear();
         clear_frame_.color_pattern.clear();
@@ -132,7 +132,7 @@ void BebopAnimator::Process()
         anim_.keyframes.push_back(clear_frame_);
         anim_.timing_function = autonomy_leds_msgs::AnimationConstPtr::element_type::TIMING_FUNCTION_EASE_OUT;
     }
-    else if( dir_ptr_->anim_type == autonomy_leds_msgs::DirectionalConstPtr::element_type::TYPE_SEARCH_1)
+    else if( dir_ptr_->anim_type == autonomy_leds_msgs::FeedbackConstPtr::element_type::TYPE_SEARCH_1)
     {
         key_frame_.color_pattern.clear();
         key_frame_.color_pattern.push_back( dir_ptr_->arrow_color);
@@ -146,7 +146,7 @@ void BebopAnimator::Process()
         anim_.keyframes.push_back(key_frame_);
         anim_.timing_function = autonomy_leds_msgs::AnimationConstPtr::element_type::TIMING_FUNCTION_LINEAR;
     }
-    else if( dir_ptr_->anim_type == autonomy_leds_msgs::DirectionalConstPtr::element_type::TYPE_SEARCH_2)
+    else if( dir_ptr_->anim_type == autonomy_leds_msgs::FeedbackConstPtr::element_type::TYPE_SEARCH_2)
     {
         key_frame_.color_pattern.clear();
         key_frame_.color_pattern.push_back( _cc);

@@ -7,7 +7,7 @@
 #include "autonomy_leds_msgs/Command.h"
 #include "autonomy_leds_msgs/Keyframe.h"
 #include "autonomy_leds_msgs/Animation.h"
-#include "autonomy_leds_msgs/Directional.h"
+#include "autonomy_leds_msgs/Feedback.h"
 
 #include <ros/ros.h>
 #include <ros/time.h>
@@ -31,7 +31,7 @@ private:
   double max_vel;
   double max_view_ang;
   std_msgs::ColorRGBA _cc;
-  autonomy_leds_msgs::DirectionalConstPtr dir_ptr_;
+  autonomy_leds_msgs::FeedbackConstPtr dir_ptr_;
   autonomy_leds_msgs::Keyframe key_frame_, clear_frame_;
   autonomy_leds_msgs::Animation anim_;
 
@@ -39,7 +39,7 @@ private:
   ros::Publisher kf_pub_;
   ros::Publisher anim_pub_;
 
-  void DirectionTranslatorCallback(const autonomy_leds_msgs::DirectionalConstPtr& dir_ptr);
+  void DirectionTranslatorCallback(const autonomy_leds_msgs::FeedbackConstPtr& dir_ptr);
   void Process();
   virtual void SpinOnce();
 
